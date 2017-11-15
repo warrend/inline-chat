@@ -3,8 +3,6 @@ const webpack = require('webpack')
 const path = require('path') 
 const open = require('open')
 
-/* eslint-disable no-console */
-
 const port = 8000;  
 const app = express();  
 
