@@ -2,9 +2,8 @@ const express = require('express')
 const webpack = require('webpack')
 const path = require('path') 
 const open = require('open')
-
-const port = 8000;  
 const app = express();  
+const port = 8000;  
 
 app.use(express.static(__dirname + '/public'));
 
