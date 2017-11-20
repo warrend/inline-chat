@@ -37,8 +37,10 @@ class Chat extends Component {
     document.getElementById('message').value = ''
   }
 
-  handleClickMessage = (message) => {
-    console.log("Message clicked: " + )
+  handleClickMessage = (event) => {
+    let id = event.currentTarget.dataset.id 
+    console.log("Message clicked: " + id)
+    document.querySelector('.response-' + id).innerHTML = '<p>Response text</p>'
   }
   
   render() {
@@ -50,9 +52,9 @@ class Chat extends Component {
             <div id="output">
               {messages.map((message, key) => {
                 return (
-                  <div key={key} id={key} onClick={this.handleClickMessage}>
+                  <div onClick={this.handleClickMessage.bind(this)} data-id={key} key={key}>
                     <p>{message.user}: {message.message}</p>
-                    <div id="response"></div>
+                    <div className={"response-" + key}></div>
                   </div>
                 )
               })}
