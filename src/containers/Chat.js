@@ -25,6 +25,10 @@ class Chat extends Component {
     this.setState({message: event.target.value})
   }
 
+  handleUserChange = (event) => {
+    this.setState({user: event.target.value})
+  }
+
   handleSubmit = (event) => {
     console.log("Submit button clicked to send: ", this.state.message)
     socket.emit('chat', this.state.message)
@@ -50,6 +54,7 @@ class Chat extends Component {
             </div>
             <div id="feedback"></div>
           </div>
+          <input type="text" id="user" value={this.state.value} onChange={this.handleUserChange} />
           <input type="text" id="message" value={this.state.value} onChange={this.handleChange} />
           <button type="submit" onClick={this.handleSubmit}>Send</button>
         </div>
