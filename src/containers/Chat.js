@@ -8,6 +8,7 @@ class Chat extends Component {
 
 		this.state = { 
       message: '',
+      user: '',
       messages: []
     }
   }
@@ -31,7 +32,7 @@ class Chat extends Component {
 
   handleSubmit = (event) => {
     console.log("Submit button clicked to send: ", this.state.message)
-    socket.emit('chat', this.state.message)
+    socket.emit('chat', {message: this.state.message, user: this.state.user})
     // reset form upon send
     document.getElementById('message').value = ''
   }
@@ -46,7 +47,7 @@ class Chat extends Component {
               {messages.map((message, key) => {
                 return (
                   <div key={key}>
-                    <p>{message}</p>
+                    <p>{message.user}: {message.message}</p>
                     <div id="response"></div>
                   </div>
                 )
