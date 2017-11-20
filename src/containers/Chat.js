@@ -7,6 +7,8 @@ class Chat extends Component {
 		super(props);
 
 		this.state = { 
+      response: false,
+      selected: null,
       message: '',
       user: '',
       messages: []
@@ -14,12 +16,27 @@ class Chat extends Component {
   }
 
   componentDidMount() {
-    socket.on('chat', (data) => {
-      console.log("Received from server: " + data)
-      this.setState({
-        messages: this.state.messages.concat(data)
+    // if response is false, concat message
+    // if response is true, find message using replyToId
+    // add message to responses []
+    let isResponse = this.state.response
+    if (isResponse) {
+      socket.on('chat', (data) => {
+        let messages = Object.assign({}, this.state.messages)
+        messages[data.replyToId].responses.concat(data)
+        this.setState({
+          messages: messages,
+          response: false
+        })
       })
-    })
+    } else {
+      socket.on('chat', (data) => {
+      console.log("Received from server: " + data)
+        this.setState({
+          messages: this.state.messages.concat(data)
+        })
+      })
+    }
   }
 
   handleChange = (event) => {
@@ -31,16 +48,33 @@ class Chat extends Component {
   }
 
   handleSubmit = (event) => {
-    console.log("Submit button clicked to send: ", this.state.message)
-    socket.emit('chat', {message: this.state.message, user: this.state.user})
+    if (!this.state.response) {
+      console.log("Submit button clicked to send: ", this.state.message)
+      socket.emit('chat', {
+        message: this.state.message, 
+        user: this.state.user,
+        responses: []
+      })
+    } else {
+      let id = this.state.selected
+      socket.emit('chat',{
+        message: this.state.message,
+        user: this.state.user,
+        replyToId: id
+      })
+    }
     // reset form upon send
     document.getElementById('message').value = ''
   }
 
   handleClickMessage = (event) => {
-    let id = event.currentTarget.dataset.id 
-    console.log("Message clicked: " + id)
-    document.querySelector('.response-' + id).innerHTML = '<p>Response text</p>'
+    let id = event.currentTarget.dataset.id
+    this.setState({
+      response: !this.state.response,
+      selected: id
+    })
+    //let id = event.currentTarget.dataset.id 
+    //console.log("Message clicked: " + id)
   }
   
   render() {
