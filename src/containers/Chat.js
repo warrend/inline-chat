@@ -36,6 +36,10 @@ class Chat extends Component {
     // reset form upon send
     document.getElementById('message').value = ''
   }
+
+  handleClickMessage = (message) => {
+    console.log("Message clicked: " + )
+  }
   
   render() {
     const messages = this.state.messages
@@ -46,7 +50,7 @@ class Chat extends Component {
             <div id="output">
               {messages.map((message, key) => {
                 return (
-                  <div key={key}>
+                  <div key={key} id={key} onClick={this.handleClickMessage}>
                     <p>{message.user}: {message.message}</p>
                     <div id="response"></div>
                   </div>
