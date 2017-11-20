@@ -20,10 +20,10 @@ class Chat extends Component {
     // if response is true, find message using replyToId
     // add message to responses []
     let isResponse = this.state.response
-    if (isResponse) {
+    if (isResponse === true) {
       socket.on('chat', (data) => {
         let messages = Object.assign({}, this.state.messages)
-        messages[data.replyToId].responses.concat(data)
+        messages[this.state.selected].responses.push(data)
         this.setState({
           messages: messages,
           response: false
@@ -32,8 +32,9 @@ class Chat extends Component {
     } else {
       socket.on('chat', (data) => {
       console.log("Received from server: " + data)
+        let messages = this.state.messages.concat(data)
         this.setState({
-          messages: this.state.messages.concat(data)
+          messages: messages
         })
       })
     }
@@ -48,7 +49,7 @@ class Chat extends Component {
   }
 
   handleSubmit = (event) => {
-    if (!this.state.response) {
+    if (this.state.response === true) {
       console.log("Submit button clicked to send: ", this.state.message)
       socket.emit('chat', {
         message: this.state.message, 
@@ -60,6 +61,7 @@ class Chat extends Component {
       socket.emit('chat',{
         message: this.state.message,
         user: this.state.user,
+        responses: [],
         replyToId: id
       })
     }
@@ -67,10 +69,18 @@ class Chat extends Component {
     document.getElementById('message').value = ''
   }
 
+  renderResponses = (message) => {
+    if (message.responses) {
+      {message.responses.map((response, key) => {
+        return <p key={key}>{response.user}: {response.message}</p> 
+      })}
+    }
+  }
+
   handleClickMessage = (event) => {
     let id = event.currentTarget.dataset.id
     this.setState({
-      response: !this.state.response,
+      response: true,
       selected: id
     })
     //let id = event.currentTarget.dataset.id 
@@ -88,7 +98,9 @@ class Chat extends Component {
                 return (
                   <div onClick={this.handleClickMessage.bind(this)} data-id={key} key={key}>
                     <p>{message.user}: {message.message}</p>
-                    <div className={"response-" + key}></div>
+                    <div className={"response-" + key}>
+                      {this.renderResponses(this)}
+                    </div>
                   </div>
                 )
               })}
