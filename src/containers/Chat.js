@@ -17,20 +17,23 @@ class Chat extends Component {
   }
 
   componentDidMount() {
-    // if response is false, concat message
-    // if response is true, find message using replyToId
-    // add message to responses []
     socket.on('chat', (data) => {
       if (this.state.response === true) {
-        let messages = Object.assign({}, this.state.messages, {responses: data})
+        let selected = this.state.selected
+        let copyState = Object.assign({}, this.state)
+        let leftState = copyState.messages.slice(0, selected + 1)
+        let rightState = copyState.messages.slice(selected + 1)
+        let newState = [...leftState, data, ...rightState]
+        let updateSelected = this.state.messages.length
         this.setState({
           messages: messages,
-          response: false
+          response: false,
+          selected: selected
         })
-      } else if (this.state.response === false) {
+      } else {
           let messages = Object.assign({}, this.state.messages.concat(data))
           this.setState({
-            messages: this.state.messages.concat(data)
+            messages: messages
           })
         }
     })
@@ -49,7 +52,6 @@ class Chat extends Component {
     socket.emit('chat', {
       message: this.state.message, 
       user: this.state.user,
-      responses: null
     })
     // reset form upon send
     document.getElementById('message').value = ''
