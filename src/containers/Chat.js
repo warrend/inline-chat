@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import update from 'react-addons-update'
 const io = require('socket.io-client')  
 const socket = io('http://localhost:8000')
 
@@ -19,25 +20,20 @@ class Chat extends Component {
     // if response is false, concat message
     // if response is true, find message using replyToId
     // add message to responses []
-    let isResponse = this.state.response
-    if (isResponse === true) {
-      socket.on('chat', (data) => {
-        let messages = Object.assign({}, this.state.messages)
-        messages[this.state.selected].responses.push(data)
+    socket.on('chat', (data) => {
+      if (this.state.response === true) {
+        let messages = Object.assign({}, this.state.messages, {responses: data})
         this.setState({
           messages: messages,
           response: false
         })
-      })
-    } else {
-      socket.on('chat', (data) => {
-      console.log("Received from server: " + data)
-        let messages = this.state.messages.concat(data)
-        this.setState({
-          messages: messages
-        })
-      })
-    }
+      } else if (this.state.response === false) {
+          let messages = Object.assign({}, this.state.messages.concat(data))
+          this.setState({
+            messages: this.state.messages.concat(data)
+          })
+        }
+    })
   }
 
   handleChange = (event) => {
@@ -49,32 +45,14 @@ class Chat extends Component {
   }
 
   handleSubmit = (event) => {
-    if (this.state.response === true) {
-      console.log("Submit button clicked to send: ", this.state.message)
-      socket.emit('chat', {
-        message: this.state.message, 
-        user: this.state.user,
-        responses: []
-      })
-    } else {
-      let id = this.state.selected
-      socket.emit('chat',{
-        message: this.state.message,
-        user: this.state.user,
-        responses: [],
-        replyToId: id
-      })
-    }
+    console.log("Submit button clicked to send: ", this.state.message)
+    socket.emit('chat', {
+      message: this.state.message, 
+      user: this.state.user,
+      responses: null
+    })
     // reset form upon send
     document.getElementById('message').value = ''
-  }
-
-  renderResponses = (message) => {
-    if (message.responses) {
-      {message.responses.map((response, key) => {
-        return <p key={key}>{response.user}: {response.message}</p> 
-      })}
-    }
   }
 
   handleClickMessage = (event) => {
@@ -99,7 +77,7 @@ class Chat extends Component {
                   <div onClick={this.handleClickMessage.bind(this)} data-id={key} key={key}>
                     <p>{message.user}: {message.message}</p>
                     <div className={"response-" + key}>
-                      {this.renderResponses(this)}
+                      
                     </div>
                   </div>
                 )
