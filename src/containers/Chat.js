@@ -29,6 +29,8 @@ class Chat extends Component {
           response: false,
           selected: null
         })
+        let highlight = document.querySelector(".response-" + selected + " p")
+        highlight.style.cssText = "border: none"
       } else {
           console.log("Regular fired")
           this.setState({
@@ -58,6 +60,8 @@ class Chat extends Component {
 
   handleClickMessage = (event) => {
     let id = event.currentTarget.dataset.id
+    let highlight = document.querySelector(".response-" + id + " p")
+    highlight.style.cssText = "border: 1px solid"
     this.setState({
       response: true,
       selected: id
@@ -75,11 +79,8 @@ class Chat extends Component {
             <div id="output">
               {messages.map((message, key) => {
                 return (
-                  <div onClick={this.handleClickMessage.bind(this)} data-id={key} key={key}>
+                  <div onClick={this.handleClickMessage.bind(this)} className={"response-" + key} data-id={key} key={key}>
                     <p>{message.user}: {message.message}</p>
-                    <div className={"response-" + key}>
-                      
-                    </div>
                   </div>
                 )
               })}
