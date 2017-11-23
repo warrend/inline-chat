@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import update from 'react-addons-update'
 const io = require('socket.io-client')  
 const socket = io('http://localhost:8000')
 
@@ -19,21 +18,21 @@ class Chat extends Component {
   componentDidMount() {
     socket.on('chat', (data) => {
       if (this.state.response === true) {
-        let selected = this.state.selected
+        let selected = parseInt(this.state.selected, 10)
         let copyState = Object.assign({}, this.state)
         let leftState = copyState.messages.slice(0, selected + 1)
         let rightState = copyState.messages.slice(selected + 1)
         let newState = [...leftState, data, ...rightState]
-        let updateSelected = this.state.messages.length
+        console.log("Response fired")
         this.setState({
-          messages: messages,
+          messages: newState,
           response: false,
-          selected: selected
+          selected: null
         })
       } else {
-          let messages = Object.assign({}, this.state.messages.concat(data))
+          console.log("Regular fired")
           this.setState({
-            messages: messages
+            messages: this.state.messages.concat(data)
           })
         }
     })
