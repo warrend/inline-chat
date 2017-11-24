@@ -27,14 +27,16 @@ class Chat extends Component {
         this.setState({
           messages: newState,
           response: false,
-          selected: null
+          selected: null,
+          socket: socket.id
         })
         let highlight = document.querySelector(".response-" + selected + " p")
         highlight.style.cssText = "border: none"
       } else {
-          console.log("Regular fired")
+          console.log("Regular fired", socket)
           this.setState({
-            messages: this.state.messages.concat(data)
+            messages: this.state.messages.concat(data),
+            socket: socket.id
           })
         }
     })
@@ -50,12 +52,15 @@ class Chat extends Component {
 
   handleSubmit = (event) => {
     console.log("Submit button clicked to send: ", this.state.message)
+    let userId = socket.id
+    
     socket.emit('chat', {
       message: this.state.message, 
       user: this.state.user,
     })
     // reset form upon send
     document.getElementById('message').value = ''
+    
   }
 
   handleClickMessage = (event) => {
@@ -80,7 +85,7 @@ class Chat extends Component {
               {messages.map((message, key) => {
                 return (
                   <div onClick={this.handleClickMessage.bind(this)} className={"response-" + key} data-id={key} key={key}>
-                    <p>{message.user}: {message.message}</p>
+                    <p className="message">{message.user}: {message.message}</p>
                   </div>
                 )
               })}
